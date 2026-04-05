@@ -1,0 +1,125 @@
+.card {
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.dashboard-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.dashboard-card .icon {
+    font-size: 30px;
+    opacity: 0.9;
+}
+
+.dashboard-card h6 {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.dashboard-card h3 {
+    margin: 5px 0 0;
+    font-weight: 600;
+}
+
+.bg-total {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.bg-pending {
+    background: linear-gradient(135deg, #f6d365, #fda085);
+}
+
+.bg-delivered {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+.bg-cancelled {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+}
+
+.table {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background: #6c63ff !important;
+}
+
+.table thead th {
+    color: #fff;
+    font-weight: 500;
+    font-size: 13px;
+    border: 1px solid #6c63ff;
+    padding: 12px;
+}
+
+.table tbody td {
+    border: 1px solid #eee;
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background: #f9fafc;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-transform: capitalize;
+}
+
+.cursor {
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+    margin-right: 10px;
+}
+
+.cursor:hover {
+    transform: scale(1.2);
+}
+
+.fa-eye {
+    color: #4e73df;
+}
+
+.fa-sync-alt {
+    color: #1cc88a;
+}
+
+.fa-trash {
+    color: #e74a3b;
+}
+
+.pagination {
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.page-item .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+    border: 1px solid #ddd;
+}
+
+.page-item.active .page-link {
+    background: #6c63ff;
+    border-color: #6c63ff;
+    color: #fff;
+}

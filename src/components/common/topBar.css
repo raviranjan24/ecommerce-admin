@@ -1,0 +1,37 @@
+.topbar {
+  background: #f8f9fa;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Left Section */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Right Section */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Icons */
+.topbar-icon {
+  font-size: 14px;
+  color: #555;
+}
+
+.dropdown-icon {
+  font-size: 10px;
+  color: #777;
+}

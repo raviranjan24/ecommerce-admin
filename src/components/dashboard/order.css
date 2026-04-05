@@ -1,0 +1,132 @@
+/* Card Styling */
+.custom-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 12px rgba(240, 81, 81, 0.61);
+  background: #fff;
+}
+
+/* Header */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.table-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+/* View All Button */
+.view-btn {
+  background: #5a06f7;
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+}
+
+.view-btn:hover {
+  background: #e63b3d;
+}
+
+/* Table */
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Table Head */
+.custom-table thead {
+  background: #f8d7da;
+}
+
+.custom-table thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  padding: 12px;
+  text-align: left;
+}
+
+/* Table Body */
+.custom-table tbody tr {
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.custom-table tbody td {
+  font-size: 13px;
+  color: #444;
+  padding: 14px 12px;
+  vertical-align: middle;
+}
+
+/* Status Badge */
+.status-badge {
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.status-shipping {
+  background: #17a2b8;
+}
+
+.status-processing {
+  background: #4e73df;
+}
+
+.status-delivered {
+  background: #28a745;
+}
+
+/* Amount */
+.amount {
+  font-weight: 500;
+}
+
+/* Action Icons */
+.action-icons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  color: #666;
+}
+
+.action-icons svg {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.action-icons svg:hover {
+  color: #000;
+}
+
+/* Pagination */
+.custom-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.custom-pagination .page-item .page-link {
+  border-radius: 4px;
+  margin: 0 3px;
+  font-size: 12px;
+  padding: 4px 10px;
+  color: #555;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background: #4e73df;
+  border-color: #4e73df;
+  color: #fff;
+}
