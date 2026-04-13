@@ -17,6 +17,7 @@ import ProductTags from "../pages/productTags";
 import AddProduct from "../pages/addProduct";
 import DashboardLayout from "../components/layout/layout";
 import ProtectedRoute from "../utils/ProtectedRoute";
+import ProductEdit from "../pages/productEdit"; 
 
 const AppRoutes = () => {
   const isLogin = localStorage.getItem("isLogin");
@@ -38,7 +39,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/edit-product/:id" element={<AddProduct />} />
+          <Route path="/edit-product/:id" element={<ProductEdit/>} />
           <Route path="products/attributes" element={<ProductAttributes />} />
           <Route path="products/tag" element={<ProductTags />} />
           <Route path="customers" element={<Customers />} />

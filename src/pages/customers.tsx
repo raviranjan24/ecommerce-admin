@@ -1,17 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axiosInstance from "../utils/axios";
 import {
   Card,
   CardBody,
   Table,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
   Row,
   Col,
 } from "reactstrap";
 
 import {
-  FaEdit,
+  FaTrash,
   FaToggleOn,
   FaToggleOff,
   FaUsers,
@@ -20,92 +18,127 @@ import {
   FaUserPlus,
 } from "react-icons/fa";
 
-const initialCustomers = [
-  { id: 1, name: "Ravi Kumar", email: "ravi@gmail.com", phone: "9876543210", status: "active" },
-  { id: 2, name: "Amit Singh", email: "amit@gmail.com", phone: "9123456780", status: "disabled" },
-  { id: 3, name: "Priya Sharma", email: "priya@gmail.com", phone: "9988776655", status: "active" },
-  { id: 4, name: "Rahul Verma", email: "rahul@gmail.com", phone: "9012345678", status: "active" },
-  { id: 5, name: "Neha Gupta", email: "neha@gmail.com", phone: "9090909090", status: "disabled" },
-  { id: 6, name: "Sanjay Kumar", email: "sanjay@gmail.com", phone: "8888888888", status: "active" },
-];
-
-const ITEMS_PER_PAGE = 5;
-
 const Customers = () => {
-  const [customers, setCustomers] = useState(initialCustomers);
-  const [page, setPage] = useState(1);
-  const totalPages = Math.ceil(customers.length / ITEMS_PER_PAGE);
-  const currentData = customers.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const totalCustomers = customers.length;
-  const activeCustomers = customers.filter(c => c.status === "active").length;
-  const disabledCustomers = customers.filter(c => c.status === "disabled").length;
-  const newCustomers = 2;
+  // ===========================
+  // 🔥 FETCH USERS
+  // ===========================
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
 
-  const toggleStatus = (id: number) => {
+      const res = await axiosInstance.get("/api/user/all");
+
+      const users = res?.data?.data?.users || [];
+
+      // Add UI status (since API not giving)
+      const mapped = users.map((u: any) => ({
+        ...u,
+        status: "active", // default
+      }));
+
+      setCustomers(mapped);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // ===========================
+  // 🔁 TOGGLE (UI ONLY)
+  // ===========================
+  const toggleStatus = (id: string) => {
     const updated = customers.map((c) =>
-      c.id === id
-        ? { ...c, status: c.status === "active" ? "disabled" : "active" }
+      c._id === id
+        ? {
+            ...c,
+            status: c.status === "active" ? "disabled" : "active",
+          }
         : c
     );
+
     setCustomers(updated);
   };
 
+  // ===========================
+  // ❌ DELETE (UI ONLY)
+  // ===========================
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Delete this user?")) return;
+
+    const updated = customers.filter((c) => c._id !== id);
+    setCustomers(updated);
+  };
+
+  // ===========================
+  // 📊 STATS
+  // ===========================
+  const totalCustomers = customers.length;
+  const activeCustomers = customers.filter(c => c.status === "active").length;
+  const disabledCustomers = customers.filter(c => c.status === "disabled").length;
+  const newCustomers = 2; // static for now
+
   return (
     <>
+      {/* 🔥 STATS */}
       <Row className="mb-4">
         <Col md="3">
           <div className="dashboard-card bg-total">
-            <div>
-              <h6>Total Customers</h6>
-              <h3>{totalCustomers}</h3>
-            </div>
-            <FaUsers className="icon" />
+            <h6>Total Customers</h6>
+            <h3>{totalCustomers}</h3>
+            <FaUsers />
           </div>
         </Col>
 
         <Col md="3">
           <div className="dashboard-card bg-delivered">
-            <div>
-              <h6>Active</h6>
-              <h3>{activeCustomers}</h3>
-            </div>
-            <FaUserCheck className="icon" />
+            <h6>Active</h6>
+            <h3>{activeCustomers}</h3>
+            <FaUserCheck />
           </div>
         </Col>
 
         <Col md="3">
           <div className="dashboard-card bg-cancelled">
-            <div>
-              <h6>Disabled</h6>
-              <h3>{disabledCustomers}</h3>
-            </div>
-            <FaUserTimes className="icon" />
+            <h6>Disabled</h6>
+            <h3>{disabledCustomers}</h3>
+            <FaUserTimes />
           </div>
         </Col>
 
         <Col md="3">
           <div className="dashboard-card bg-pending">
-            <div>
-              <h6>New Users</h6>
-              <h3>{newCustomers}</h3>
-            </div>
-            <FaUserPlus className="icon" />
+            <h6>New Users</h6>
+            <h3>{newCustomers}</h3>
+            <FaUserPlus />
           </div>
         </Col>
       </Row>
 
+      {/* TABLE */}
       <Card className="shadow-sm border-0">
         <CardBody>
           <h5 className="mb-3">Customers List</h5>
 
-          <Table className="custom-table" borderless responsive>
+          {/* Loader */}
+          {loading && (
+            <div style={{ textAlign: "center", padding: 10 }}>
+              <div className="spinner-border text-primary" />
+            </div>
+          )}
+
+          <Table bordered hover responsive>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Profile</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -115,58 +148,78 @@ const Customers = () => {
             </thead>
 
             <tbody>
-              {currentData.map((c) => (
-                <tr key={c.id}>
-                  <td>#{c.id}</td>
+              {!loading && customers.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: "center" }}>
+                    No users found 🚫
+                  </td>
+                </tr>
+              )}
+
+              {customers.map((c) => (
+                <tr key={c._id}>
+                  {/* PROFILE */}
+                  <td>
+                    <img
+                      src={c.profilePicture}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </td>
+
                   <td>{c.name}</td>
-                  <td>{c.email}</td>
+                  <td style={{ fontSize: "12px" }}>{c.email}</td>
                   <td>{c.phone}</td>
 
-                  {/* Status */}
+                  {/* STATUS */}
                   <td>
                     <span
-                      className={`badge ${c.status === "active"
-                          ? "bg-success"
-                          : "bg-danger"
-                        }`}
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: 20,
+                        fontSize: 11,
+                        background:
+                          c.status === "active"
+                            ? "#d1fae5"
+                            : "#fee2e2",
+                        color:
+                          c.status === "active"
+                            ? "#065f46"
+                            : "#991b1b",
+                      }}
                     >
                       {c.status}
                     </span>
                   </td>
 
-                  {/* Actions */}
-                  <td className="text-center">
+                  {/* ACTION */}
+                  <td style={{ textAlign: "center" }}>
                     {c.status === "active" ? (
                       <FaToggleOn
-                        className="cursor text-success"
-                        onClick={() => toggleStatus(c.id)}
+                        color="green"
+                        style={{ cursor: "pointer", marginRight: 10 }}
+                        onClick={() => toggleStatus(c._id)}
                       />
                     ) : (
                       <FaToggleOff
-                        className="cursor text-secondary"
-                        onClick={() => toggleStatus(c.id)}
+                        style={{ cursor: "pointer", marginRight: 10 }}
+                        onClick={() => toggleStatus(c._id)}
                       />
                     )}
 
-                    <FaEdit
-                      className="cursor ms-3"
-                      onClick={() => alert("Edit " + c.name)}
+                    <FaTrash
+                      color="red"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleDelete(c._id)}
                     />
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
-
-          <Pagination>
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem active={page === i + 1} key={i}>
-                <PaginationLink onClick={() => setPage(i + 1)}>
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-          </Pagination>
         </CardBody>
       </Card>
     </>

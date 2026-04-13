@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import axiosInstance from "../utils/axios";
 import {
   Card,
   CardBody,
@@ -9,260 +10,296 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
+  FormGroup,
+  Label,
 } from "reactstrap";
-import {
-  FaEdit,
-  FaTrash,
-  FaEye,
-  FaToggleOn,
-  FaToggleOff,
-  FaPlus,
-} from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  status: "active" | "disabled";
-}
+const Categories = () => {
+  const [categories, setCategories] = useState<any>([]);
+  const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-interface CategoryForm {
-  name: string;
-  description: string;
-}
-
-const ITEMS_PER_PAGE = 5;
-
-const Categories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([
-    {
-      id: 1,
-      name: "Dairy",
-      description: "Milk products",
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Bakery",
-      description: "Bread & cakes",
-      status: "disabled",
-    },
-    {
-      id: 3,
-      name: "Groceries",
-      description: "Daily essentials",
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Beverages",
-      description: "Drinks & juices",
-      status: "active",
-    },
-    {
-      id: 5,
-      name: "Snacks",
-      description: "Chips & snacks",
-      status: "disabled",
-    },
-    {
-      id: 6,
-      name: "Frozen",
-      description: "Frozen foods",
-      status: "active",
-    },
-  ]);
-
-  const [page, setPage] = useState<number>(1);
-  const [modal, setModal] = useState<boolean>(false);
-  const [viewModal, setViewModal] = useState<boolean>(false);
-  const [editData, setEditData] = useState<Category | null>(null);
-
-  const [form, setForm] = useState<CategoryForm>({
-    name: "",
-    description: "",
+  const [formData, setFormData] = useState({
+    title: "",
+    isActive: true,
+    image: null as File | null,
   });
 
-  const totalPages = Math.ceil(categories.length / ITEMS_PER_PAGE);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  const currentData = categories.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+  const toggle = () => setModal(!modal);
 
-  const toggleModal = () => setModal(!modal);
-  const toggleView = () => setViewModal(!viewModal);
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await axiosInstance.get("/api/category/admin/list");
+      setCategories(res?.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleSave = () => {
-    if (!form.name || !form.description) {
-      alert("Fill all fields");
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: name === "isActive" ? value === "true" : value,
+    });
+  };
+
+  const handleImage = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  
+  const handleSubmit = async () => {
+    if (!formData.title) {
+      alert("Title required");
       return;
     }
 
-    if (editData) {
-      setCategories((prev) =>
-        prev.map((c) =>
-          c.id === editData.id ? { ...c, ...form } : c
-        )
-      );
-    } else {
-      const newCategory: Category = {
-        id: Date.now(),
-        ...form,
-        status: "active",
-      };
-      setCategories((prev) => [...prev, newCategory]);
-    }
+    try {
+      setLoading(true);
 
-    setForm({ name: "", description: "" });
-    setEditData(null);
-    toggleModal();
+      const data = new FormData();
+      if (formData.image) data.append("image", formData.image);
+      data.append("title", formData.title);
+      data.append("isActive", String(formData.isActive));
+
+      if (editId) {
+        await axiosInstance.put(`/api/category/update/${editId}`, data);
+      } else {
+        await axiosInstance.post("/api/category/add", data);
+      }
+
+      await fetchCategories();
+      resetForm();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEdit = (item: Category) => {
-    setEditData(item);
-    setForm({
-      name: item.name,
-      description: item.description,
+  const resetForm = () => {
+    setFormData({ title: "", isActive: true, image: null });
+    setPreview(null);
+    setEditId(null);
+    toggle();
+  };
+
+  const handleEdit = (item: any) => {
+    setEditId(item._id);
+    setFormData({
+      title: item.title,
+      isActive: item.isActive,
+      image: null,
     });
-    toggleModal();
+    setPreview(item.image);
+    toggle();
   };
 
-  const handleDelete = (id: number) => {
-    if (window.confirm("Delete this category?")) {
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+  // ===========================
+  // DELETE
+  // ===========================
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Delete this category?")) return;
+
+    try {
+      setLoading(true);
+      await axiosInstance.delete(`/api/category/delete/${id}`);
+      await fetchCategories();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const toggleStatus = (id: number) => {
-    setCategories((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? {
-            ...c,
-            status: c.status === "active" ? "disabled" : "active",
-          }
-          : c
-      )
-    );
   };
 
   return (
-    <Card className="custom-card">
+    <Card className="shadow-sm border-0">
       <CardBody>
-        <div className="table-header">
-          <div className="table-title">Categories</div>
-          <Button color="primary" size="sm" onClick={toggleModal}>
-            <FaPlus /> Add Category
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "15px",
+          }}
+        >
+          <h5 style={{ margin: 0, fontWeight: 600 }}>
+            Categories
+          </h5>
+
+          <Button
+            size="sm"
+            color="primary"
+            onClick={() => {
+              setEditId(null);
+              setFormData({
+                title: "",
+                isActive: true,
+                image: null,
+              });
+              setPreview(null);
+              toggle();
+            }}
+          >
+            + Add Category
           </Button>
         </div>
-        <Table className="custom-table" borderless responsive>
+
+        {/* Loader */}
+        {loading && (
+          <div style={{ textAlign: "center", padding: "10px" }}>
+            <div className="spinner-border text-primary" />
+          </div>
+        )}
+
+        {/* Table */}
+        <Table bordered hover responsive className="align-middle">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
+              <th>Image</th>
+              <th>Title</th>
               <th>Status</th>
               <th style={{ textAlign: "center" }}>Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {currentData.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.description}</td>
+            {!loading && categories.length === 0 && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", padding: 20 }}>
+                  No categories found
+                </td>
+              </tr>
+            )}
+
+            {categories?.data?.map((item:any) => (
+              <tr key={item._id}>
+                <td>
+                  <img
+                    src={item.image}
+                    style={{
+                      width: "60px",
+                      height: "40px",
+                      objectFit: "cover",
+                      borderRadius: "6px",
+                    }}
+                  />
+                </td>
+
+                <td style={{ fontSize: "13px" }}>{item.title}</td>
+
                 <td>
                   <span
-                    className={`status-badge ${item.status === "active"
-                      ? "status-delivered"
-                      : "status-processing"
-                      }`}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: "20px",
+                      fontSize: "11px",
+                      fontWeight: 500,
+                      background: item.isActive
+                        ? "#d1fae5"
+                        : "#fee2e2",
+                      color: item.isActive ? "#065f46" : "#991b1b",
+                    }}
                   >
-                    {item.status}
+                    {item.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td>
-                  <div className="action-icons">
-                    <FaEye
-                      onClick={() => {
-                        setEditData(item);
-                        toggleView();
-                      }}
+
+                <td style={{ textAlign: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <FaEdit
+                      color="#2563eb"
+                      onClick={() => handleEdit(item)}
                     />
-                    <FaEdit onClick={() => handleEdit(item)} />
-                    <FaTrash onClick={() => handleDelete(item.id)} />
-                    {item.status === "active" ? (
-                      <FaToggleOn
-                        style={{ color: "green" }}
-                        onClick={() => toggleStatus(item.id)}
-                      />
-                    ) : (
-                      <FaToggleOff
-                        style={{ color: "gray" }}
-                        onClick={() => toggleStatus(item.id)}
-                      />
-                    )}
+                    <FaTrash
+                      color="#dc2626"
+                      onClick={() => handleDelete(item._id)}
+                    />
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </Table>
-        <div className="custom-pagination">
-          <Pagination size="sm">
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem active={page === i + 1} key={i}>
-                <PaginationLink onClick={() => setPage(i + 1)}>
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-          </Pagination>
-        </div>
+
+        {/* Modal */}
+        <Modal isOpen={modal} toggle={toggle}>
+          <ModalHeader toggle={toggle}>
+            {editId ? "Edit Category" : "Add Category"}
+          </ModalHeader>
+
+          <ModalBody>
+            <FormGroup>
+              <Label>Title</Label>
+              <Input
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label>Upload Image</Label>
+              <Input type="file" onChange={handleImage} />
+            </FormGroup>
+
+            {preview && (
+              <img
+                src={preview}
+                style={{
+                  width: "100%",
+                  borderRadius: "8px",
+                  marginTop: "10px",
+                }}
+              />
+            )}
+
+            <FormGroup>
+              <Label>Status</Label>
+              <Input
+                type="select"
+                name="isActive"
+                value={String(formData.isActive)}
+                onChange={handleChange}
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </Input>
+            </FormGroup>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? "Saving..." : "Save"}
+            </Button>
+            <Button onClick={toggle}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
       </CardBody>
-      <Modal isOpen={modal} toggle={toggleModal}>
-        <ModalHeader toggle={toggleModal}>
-          {editData ? "Edit Category" : "Add Category"}
-        </ModalHeader>
-        <ModalBody>
-          <Input
-            placeholder="Category Name"
-            className="mb-2"
-            value={form.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setForm({ ...form, name: e.target.value })
-            }
-          />
-          <Input
-            placeholder="Description"
-            value={form.description}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setForm({ ...form, description: e.target.value })
-            }
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={handleSave}>
-            Save
-          </Button>
-          <Button color="secondary" onClick={toggleModal}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
-      <Modal isOpen={viewModal} toggle={toggleView}>
-        <ModalHeader toggle={toggleView}>Category Details</ModalHeader>
-        <ModalBody>
-          <p><b>Name:</b> {editData?.name}</p>
-          <p><b>Description:</b> {editData?.description}</p>
-          <p><b>Status:</b> {editData?.status}</p>
-        </ModalBody>
-      </Modal>
     </Card>
   );
 };

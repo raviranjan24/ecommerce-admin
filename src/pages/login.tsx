@@ -41,10 +41,8 @@ const Login = () => {
           `${API_BASE_URL}${routes.authentication.loginEmail}`,
           values
         );
-        console.log("response", response);
-        //localStorage.setItem("token", response.data.token);
         if (response.status === 200) {
-          localStorage.setItem("token", '123456');
+          localStorage.setItem("userDetails", JSON.stringify(response?.data));
           localStorage.setItem("isLogin", "true");
           toast.success("Login successful..");
           navigate("/dashboard");

@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import { Card, CardBody, Row, Col, Input, Button } from "reactstrap";
 
-const COLORS = [
-  "bg-red",
-  "bg-blue",
-  "bg-green",
-  "bg-black",
-  "bg-yellow",
-];
-
+const COLORS = ["bg-red", "bg-blue", "bg-green", "bg-black", "bg-yellow"];
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
-const AddProduct = () => {
+const EditProduct = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [preview, setPreview] = useState<any>({});
 
   const [form, setForm] = useState<any>({
     title: "",
@@ -41,34 +36,63 @@ const AddProduct = () => {
     image5: null,
   });
 
-  const [preview, setPreview] = useState<any>({});
-
   // ===========================
-  // 🔥 FETCH CATEGORIES
+  // 🔥 FETCH DATA
   // ===========================
-  const fetchCategories = async () => {
+  const fetchProduct = async () => {
     try {
-      const res = await axiosInstance.get("/api/category/admin/list");
-      setCategories(res?.data?.data || []);
+      setLoading(true);
+
+      const res = await axiosInstance.get(`/api/v1/products/single/${id}`);
+      const p = res?.data?.data?.product;
+
+      setForm({
+        title: p.title || "",
+        description: p.description || "",
+        regular_price: p.pricing?.regular_price || "",
+        sell_price: p.pricing?.sell_price || "",
+        category: p.category?._id || "",
+        sku: p.inventory?.sku || "",
+        stock_quantity: p.inventory?.stock_quantity || "",
+        colors: p.variants?.colors?.map((c: any) => c.bg) || [],
+        sizes: p.variants?.sizes || [],
+        depth: p.variants?.depth || "",
+        height: p.dimensions_and_weight?.height?.replace(" cm", "") || "",
+        width: p.dimensions_and_weight?.width?.replace(" cm", "") || "",
+        length: p.dimensions_and_weight?.length?.replace(" cm", "") || "",
+        weight: p.dimensions_and_weight?.weight?.replace(" kg", "") || "",
+      });
+
+      // Existing image preview
+      setPreview({
+        image1: p.images?.main || "",
+        image2: p.images?.hover || "",
+      });
+
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const fetchCategories = async () => {
+    const res = await axiosInstance.get("/api/category/admin/list");
+    setCategories(res?.data?.data || []);
+  };
+
   useEffect(() => {
+    fetchProduct();
     fetchCategories();
   }, []);
 
   // ===========================
-  // HANDLE INPUT
+  // HANDLERS
   // ===========================
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ===========================
-  // MULTI SELECT (COLOR/SIZE)
-  // ===========================
   const handleMultiSelect = (value: string, key: string) => {
     let arr = form[key];
 
@@ -81,9 +105,6 @@ const AddProduct = () => {
     setForm({ ...form, [key]: [...arr] });
   };
 
-  // ===========================
-  // IMAGE HANDLER
-  // ===========================
   const handleImage = (e: any, key: string) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -97,9 +118,9 @@ const AddProduct = () => {
   };
 
   // ===========================
-  // SUBMIT
+  // UPDATE API
   // ===========================
-  const handleSubmit = async () => {
+  const handleUpdate = async () => {
     try {
       setLoading(true);
 
@@ -166,9 +187,9 @@ const AddProduct = () => {
         if (form[key]) data.append(key, form[key]);
       });
 
-      await axiosInstance.post("/api/v1/products/add", data);
+      await axiosInstance.put(`/api/v1/products/update/${id}`, data);
 
-      alert("Product Added ✅");
+      alert("Product Updated ✅");
       navigate("/products");
 
     } catch (err) {
@@ -182,128 +203,83 @@ const AddProduct = () => {
   return (
     <Card className="shadow-sm border-0">
       <CardBody>
-        <h5>Add Product</h5>
+        <h5>Edit Product</h5>
 
         <Row>
-          {/* TITLE */}
           <Col md={6}>
-            <Input placeholder="Title" name="title" onChange={handleChange} />
+            <Input name="title" value={form.title} onChange={handleChange} />
           </Col>
 
-          {/* CATEGORY DROPDOWN */}
           <Col md={6}>
-            <Input
-              type="select"
-              name="category"
-              onChange={handleChange}
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.title}
-                </option>
+            <Input type="select" name="category" value={form.category} onChange={handleChange}>
+              <option>Select Category</option>
+              {categories.map((c) => (
+                <option key={c._id} value={c._id}>{c.title}</option>
               ))}
             </Input>
           </Col>
 
-          {/* DESCRIPTION */}
           <Col md={12} className="mt-2">
-            <Input
-              type="textarea"
-              placeholder="Description"
-              name="description"
-              onChange={handleChange}
-            />
-          </Col>
-
-          {/* PRICE */}
-          <Col md={6} className="mt-2">
-            <Input placeholder="Regular Price" name="regular_price" onChange={handleChange} />
+            <Input type="textarea" name="description" value={form.description} onChange={handleChange} />
           </Col>
 
           <Col md={6} className="mt-2">
-            <Input placeholder="Sell Price" name="sell_price" onChange={handleChange} />
-          </Col>
-
-          {/* SKU & STOCK */}
-          <Col md={6} className="mt-2">
-            <Input placeholder="SKU" name="sku" onChange={handleChange} />
+            <Input name="regular_price" value={form.regular_price} onChange={handleChange} />
           </Col>
 
           <Col md={6} className="mt-2">
-            <Input placeholder="Stock Quantity" name="stock_quantity" onChange={handleChange} />
+            <Input name="sell_price" value={form.sell_price} onChange={handleChange} />
           </Col>
+
+          <Col md={6} className="mt-2">
+            <Input name="sku" value={form.sku} onChange={handleChange} />
+          </Col>
+
+          <Col md={6} className="mt-2">
+            <Input name="stock_quantity" value={form.stock_quantity} onChange={handleChange} />
+          </Col>
+
+          {/* DIMENSIONS */}
+          <Col md={4}><Input name="height" value={form.height} onChange={handleChange} placeholder="Height" /></Col>
+          <Col md={4}><Input name="width" value={form.width} onChange={handleChange} placeholder="Width" /></Col>
+          <Col md={4}><Input name="length" value={form.length} onChange={handleChange} placeholder="Length" /></Col>
+
+          <Col md={6}><Input name="weight" value={form.weight} onChange={handleChange} placeholder="Weight" /></Col>
+          <Col md={6}><Input name="depth" value={form.depth} onChange={handleChange} placeholder="Depth" /></Col>
 
           {/* COLORS */}
-          <Col md={6} className="mt-3">
-            <label>Colors</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {COLORS.map((color) => (
-                <span
-                  key={color}
-                  onClick={() => handleMultiSelect(color, "colors")}
-                  style={{
-                    padding: "5px 10px",
-                    borderRadius: 20,
-                    cursor: "pointer",
-                    fontSize: 12,
-                    background: form.colors.includes(color)
-                      ? "#7e6bef"
-                      : "#eee",
-                    color: form.colors.includes(color)
-                      ? "#fff"
-                      : "#000",
-                  }}
-                >
-                  {color}
-                </span>
-              ))}
-            </div>
+          <Col md={6}>
+            {COLORS.map((c) => (
+              <span key={c} onClick={() => handleMultiSelect(c, "colors")}>
+                {c}
+              </span>
+            ))}
           </Col>
 
           {/* SIZES */}
-          <Col md={6} className="mt-3">
-            <label>Sizes</label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {SIZES.map((size) => (
-                <span
-                  key={size}
-                  onClick={() => handleMultiSelect(size, "sizes")}
-                  style={{
-                    padding: "5px 10px",
-                    borderRadius: 20,
-                    cursor: "pointer",
-                    background: form.sizes.includes(size)
-                      ? "#28a745"
-                      : "#eee",
-                    color: form.sizes.includes(size)
-                      ? "#fff"
-                      : "#000",
-                  }}
-                >
-                  {size}
-                </span>
-              ))}
-            </div>
+          <Col md={6}>
+            {SIZES.map((s) => (
+              <span key={s} onClick={() => handleMultiSelect(s, "sizes")}>
+                {s}
+              </span>
+            ))}
           </Col>
 
           {/* IMAGES */}
           {["image1", "image2", "image3", "image4", "image5"].map((key) => (
-            <Col md={4} className="mt-3" key={key}>
+            <Col md={4} key={key}>
               <Input type="file" onChange={(e) => handleImage(e, key)} />
-              {preview[key] && (
-                <img src={preview[key]} style={{ width: 80, marginTop: 5 }} />
-              )}
+              {preview[key] && <img src={preview[key]} style={{ width: 80 }} />}
             </Col>
           ))}
         </Row>
 
-        <Button className="mt-3" onClick={handleSubmit} disabled={loading}>
-          {loading ? "Saving..." : "Save Product"}
+        <Button className="mt-3" onClick={handleUpdate} disabled={loading}>
+          {loading ? "Updating..." : "Update Product"}
         </Button>
       </CardBody>
     </Card>
   );
 };
 
-export default AddProduct;
+export default EditProduct;

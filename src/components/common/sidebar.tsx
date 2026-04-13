@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import "./sidebar.css";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { routes } from "../../utils/apiRoute";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -22,12 +24,33 @@ const Sidebar = () => {
     setOpenMenu(openMenu === name ? null : name);
   };
 
-  const handleLogout = () => {
-    toast.success("Logout successful..");
-    localStorage.removeItem("token");
-    localStorage.removeItem("isLogin");
-    sessionStorage.clear();
-    navigate("/login");
+  const handleLogout = async () => {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    try {
+      const user = JSON.parse(localStorage.getItem("userDetails") || "{}");
+      const response = await axios.post(
+        `${API_BASE_URL}${routes.authentication.logOut}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      if (response?.status === 200) {
+        toast.success("Logout successful..");
+        localStorage.removeItem("token");
+        localStorage.removeItem("isLogin");
+        sessionStorage.clear();
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Logout Error:", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLogin");
+      sessionStorage.clear();
+      navigate("/login");
+    }
   };
 
   const menu = [
@@ -40,7 +63,6 @@ const Sidebar = () => {
         { name: "All Products", path: "/products" },
         { name: "Add Product", path: "/add-product" },
         { name: "Category", path: "/categories" },
-        // { name: "Attributes", path: "/products/attributes" },
       ],
     },
     { name: "Customers", path: "/customers", icon: <FaUsers /> },
@@ -90,9 +112,8 @@ const Sidebar = () => {
                     ? toggleMenu(item.name)
                     : navigate(item.path!);
                 }}
-                className={`sidebar-link ${
-                  location.pathname === item.path ? "active" : ""
-                }`}
+                className={`sidebar-link ${location.pathname === item.path ? "active" : ""
+                  }`}
               >
                 <div className="menu-left">
                   <span className="menu-icon">{item.icon}</span>
@@ -101,9 +122,8 @@ const Sidebar = () => {
 
                 {item.children && (
                   <FaChevronRight
-                    className={`menu-arrow ${
-                      openMenu === item.name ? "rotate" : ""
-                    }`}
+                    className={`menu-arrow ${openMenu === item.name ? "rotate" : ""
+                      }`}
                   />
                 )}
               </NavLink>
@@ -118,9 +138,8 @@ const Sidebar = () => {
                         e.preventDefault();
                         navigate(child.path);
                       }}
-                      className={`submenu-link ${
-                        location.pathname === child.path ? "active" : ""
-                      }`}
+                      className={`submenu-link ${location.pathname === child.path ? "active" : ""
+                        }`}
                     >
                       {child.name}
                     </NavLink>
