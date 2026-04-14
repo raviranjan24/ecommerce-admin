@@ -59,9 +59,9 @@ const Customers = () => {
     const updated = customers.map((c) =>
       c._id === id
         ? {
-            ...c,
-            status: c.status === "active" ? "disabled" : "active",
-          }
+          ...c,
+          status: c.status === "active" ? "disabled" : "active",
+        }
         : c
     );
 
@@ -89,36 +89,52 @@ const Customers = () => {
   return (
     <>
       {/* 🔥 STATS */}
-      <Row className="mb-4">
+      <Row className="mb-4 g-3">
         <Col md="3">
-          <div className="dashboard-card bg-total">
-            <h6>Total Customers</h6>
-            <h3>{totalCustomers}</h3>
-            <FaUsers />
+          <div className="dashboard-card gradient-blue">
+            <div className="card-content">
+              <p>TOTAL CUSTOMERS</p>
+              <h2>{totalCustomers}</h2>
+            </div>
+            <div className="card-icon">
+              <FaUsers />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-delivered">
-            <h6>Active</h6>
-            <h3>{activeCustomers}</h3>
-            <FaUserCheck />
+          <div className="dashboard-card gradient-green">
+            <div className="card-content">
+              <p>ACTIVE USERS</p>
+              <h2>{activeCustomers}</h2>
+            </div>
+            <div className="card-icon">
+              <FaUserCheck />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-cancelled">
-            <h6>Disabled</h6>
-            <h3>{disabledCustomers}</h3>
-            <FaUserTimes />
+          <div className="dashboard-card gradient-red">
+            <div className="card-content">
+              <p>DISABLED USERS</p>
+              <h2>{disabledCustomers}</h2>
+            </div>
+            <div className="card-icon">
+              <FaUserTimes />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-pending">
-            <h6>New Users</h6>
-            <h3>{newCustomers}</h3>
-            <FaUserPlus />
+          <div className="dashboard-card gradient-purple">
+            <div className="card-content">
+              <p>NEW USERS</p>
+              <h2>{newCustomers}</h2>
+            </div>
+            <div className="card-icon">
+              <FaUserPlus />
+            </div>
           </div>
         </Col>
       </Row>

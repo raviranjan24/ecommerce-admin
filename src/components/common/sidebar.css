@@ -3,6 +3,7 @@
   height: 100vh;
   background: #2f2a4a;
   color: #fff;
+  overflow-y: auto;
 }
 
 /* Logo */

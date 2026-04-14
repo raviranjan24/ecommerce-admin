@@ -167,7 +167,7 @@ const ProductList = () => {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h5>Products</h5>
-          <Button onClick={() => navigate("/add-product")}>
+          <Button onClick={() => navigate("/add-product")}  style={{ background: "#7e6bef" }}>
             + Add Product
           </Button>
         </div>

@@ -74,13 +74,13 @@ const DashboardTable = () => {
         <Table className="custom-table" borderless responsive>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Payment Method</th>
-              <th>Order Date</th>
-              <th>Delivery Date</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th style={{ textAlign: "center" }}>Action</th>
+              <th style={{color:"#fff"}}>Order ID</th>
+              <th style={{color:"#fff"}}>Payment Method</th>
+              <th style={{color:"#fff"}}>Order Date</th>
+              <th style={{color:"#fff"}}>Delivery Date</th>
+              <th style={{color:"#fff"}}>Status</th>
+              <th style={{color:"#fff"}}>Total</th>
+              <th style={{ textAlign: "center",color:"#fff" }}>Action</th>
             </tr>
           </thead>
 

@@ -43,9 +43,6 @@ const AddProduct = () => {
 
   const [preview, setPreview] = useState<any>({});
 
-  // ===========================
-  // 🔥 FETCH CATEGORIES
-  // ===========================
   const fetchCategories = async () => {
     try {
       const res = await axiosInstance.get("/api/category/admin/list");

@@ -13,7 +13,6 @@ import {
   FaTrash,
   FaShoppingCart,
   FaClock,
-  FaCheckCircle,
   FaTimesCircle,
 } from "react-icons/fa";
 
@@ -100,7 +99,6 @@ const Orders = () => {
   // ===========================
   const totalOrders = orders.length;
   const pending = orders.filter(o => o.status === "Pending").length;
-  const delivered = orders.filter(o => o.status === "Delivered").length;
   const cancelled = orders.filter(o => o.status === "Cancelled").length;
 
   // ===========================
@@ -126,36 +124,52 @@ const Orders = () => {
   return (
     <>
       {/* 🔥 STATS */}
-      <Row className="mb-4">
+      <Row className="mb-4 g-3">
         <Col md="3">
-          <div className="dashboard-card bg-total">
-            <h6>Total Orders</h6>
-            <h3>{totalOrders}</h3>
-            <FaShoppingCart />
+          <div className="dashboard-card gradient-purple">
+            <div className="card-content">
+              <p>ORDER PENDING</p>
+              <h2>{pending}</h2>
+            </div>
+            <div className="card-icon">
+              <FaShoppingCart />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-pending">
-            <h6>Pending</h6>
-            <h3>{pending}</h3>
-            <FaClock />
+          <div className="dashboard-card gradient-red">
+            <div className="card-content">
+              <p>ORDER CANCEL</p>
+              <h2>{cancelled}</h2>
+            </div>
+            <div className="card-icon">
+              <FaTimesCircle />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-delivered">
-            <h6>Delivered</h6>
-            <h3>{delivered}</h3>
-            <FaCheckCircle />
+          <div className="dashboard-card gradient-blue">
+            <div className="card-content">
+              <p>ORDER PROCESS</p>
+              <h2>{totalOrders}</h2>
+            </div>
+            <div className="card-icon">
+              <FaClock />
+            </div>
           </div>
         </Col>
 
         <Col md="3">
-          <div className="dashboard-card bg-cancelled">
-            <h6>Cancelled</h6>
-            <h3>{cancelled}</h3>
-            <FaTimesCircle />
+          <div className="dashboard-card gradient-green">
+            <div className="card-content">
+              <p>TODAY INCOME</p>
+              <h2>₹0</h2>
+            </div>
+            <div className="card-icon">
+              ₹
+            </div>
           </div>
         </Col>
       </Row>
