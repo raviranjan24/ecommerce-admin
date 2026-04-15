@@ -147,7 +147,6 @@ const HomeSlider = () => {
           </div>
         )}
         
-
         <Table bordered hover responsive className="align-middle">
           <thead>
             <tr>
@@ -168,7 +167,6 @@ const HomeSlider = () => {
 
             {sliders?.data?.map((item: any) => (
               <tr key={item._id}>
-                {/* Image */}
                 <td>
                   <img
                     src={item.image}
@@ -182,7 +180,6 @@ const HomeSlider = () => {
                   />
                 </td>
 
-                {/* Title */}
                 <td>
                   <span
                     style={{
@@ -196,7 +193,6 @@ const HomeSlider = () => {
                   </span>
                 </td>
 
-                {/* Status */}
                 <td>
                   <span
                     style={{
@@ -214,7 +210,6 @@ const HomeSlider = () => {
                   </span>
                 </td>
 
-                {/* Actions */}
                 <td style={{ textAlign: "center" }}>
                   <div
                     style={{
@@ -239,7 +234,6 @@ const HomeSlider = () => {
           </tbody>
         </Table>
 
-        {/* Modal */}
         <Modal isOpen={modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>
             {editId ? "Edit Banner" : "Add Banner"}

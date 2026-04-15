@@ -28,7 +28,6 @@ const ContactList = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchContacts();
   }, []);
@@ -63,21 +62,18 @@ const ContactList = () => {
   return (
     <Card className="shadow-sm border-0">
       <CardBody>
-        {/* Header */}
         <div style={{ marginBottom: "15px" }}>
           <h5 style={{ margin: 0, fontWeight: 600 }}>
             Contact Submissions
           </h5>
         </div>
 
-        {/* Loader */}
         {loading && (
           <div style={{ textAlign: "center", padding: "10px" }}>
             <div className="spinner-border text-primary" />
           </div>
         )}
 
-        {/* Table */}
         <Table bordered hover responsive className="align-middle">
           <thead>
             <tr>
@@ -117,7 +113,6 @@ const ContactList = () => {
                   {formatDate(item.createdAt)}
                 </td>
 
-                {/* DELETE ONLY */}
                 <td style={{ textAlign: "center" }}>
                   <FaTrash
                     title="Delete"
@@ -131,7 +126,6 @@ const ContactList = () => {
           </tbody>
         </Table>
 
-        {/* Pagination */}
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Pagination size="sm">
             {[...Array(totalPages)].map((_, i) => (

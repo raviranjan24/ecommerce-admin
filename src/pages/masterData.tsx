@@ -23,13 +23,11 @@ const MasterData = () => {
 
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Handle Input Change
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle Logo Upload
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
@@ -38,10 +36,8 @@ const MasterData = () => {
     }
   };
 
-  // Submit
   const handleSubmit = (e: any) => {
     e.preventDefault();
-
     const data = new FormData();
     data.append("logo", formData.logo as Blob);
     data.append("email1", formData.email1);
@@ -49,9 +45,7 @@ const MasterData = () => {
     data.append("contact1", formData.contact1);
     data.append("contact2", formData.contact2);
     data.append("address", formData.address);
-
     console.log("Submitted Data:", formData);
-
     // 👉 API Call Here
     // fetch("/api/master-data", {
     //   method: "POST",
@@ -65,15 +59,12 @@ const MasterData = () => {
         <div className="table-header">
           <div className="table-title">Master Settings</div>
         </div>
-
         <Form onSubmit={handleSubmit}>
           <Row>
-            {/* Logo Upload */}
             <Col md={4}>
               <FormGroup>
                 <Label>Upload Logo</Label>
                 <Input type="file" onChange={handleFileChange} />
-
                 {preview && (
                   <div style={{ marginTop: "10px" }}>
                     <img
@@ -92,8 +83,6 @@ const MasterData = () => {
                 )}
               </FormGroup>
             </Col>
-
-            {/* Emails */}
             <Col md={4}>
               <FormGroup>
                 <Label>Email 1</Label>
@@ -106,7 +95,6 @@ const MasterData = () => {
                 />
               </FormGroup>
             </Col>
-
             <Col md={4}>
               <FormGroup>
                 <Label>Email 2</Label>
@@ -119,8 +107,6 @@ const MasterData = () => {
                 />
               </FormGroup>
             </Col>
-
-            {/* Contacts */}
             <Col md={4}>
               <FormGroup>
                 <Label>Contact 1</Label>
@@ -133,7 +119,6 @@ const MasterData = () => {
                 />
               </FormGroup>
             </Col>
-
             <Col md={4}>
               <FormGroup>
                 <Label>Contact 2</Label>
@@ -146,8 +131,6 @@ const MasterData = () => {
                 />
               </FormGroup>
             </Col>
-
-            {/* Address */}
             <Col md={12}>
               <FormGroup>
                 <Label>Address</Label>
@@ -162,8 +145,6 @@ const MasterData = () => {
               </FormGroup>
             </Col>
           </Row>
-
-          {/* Submit Button */}
           <div style={{ textAlign: "right" }}>
             <Button
               type="submit"

@@ -112,12 +112,8 @@ const Categories = () => {
     toggle();
   };
 
-  // ===========================
-  // DELETE
-  // ===========================
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this category?")) return;
-
     try {
       setLoading(true);
       await axiosInstance.delete(`/api/category/delete/${id}`);
@@ -132,7 +128,6 @@ const Categories = () => {
   return (
     <Card className="shadow-sm border-0">
       <CardBody>
-        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -162,14 +157,12 @@ const Categories = () => {
           </Button>
         </div>
 
-        {/* Loader */}
         {loading && (
           <div style={{ textAlign: "center", padding: "10px" }}>
             <div className="spinner-border text-primary" />
           </div>
         )}
 
-        {/* Table */}
         <Table bordered hover responsive className="align-middle">
           <thead>
             <tr>
@@ -179,7 +172,6 @@ const Categories = () => {
               <th style={{ textAlign: "center" }}>Action</th>
             </tr>
           </thead>
-
           <tbody>
             {!loading && categories.length === 0 && (
               <tr>
@@ -188,7 +180,6 @@ const Categories = () => {
                 </td>
               </tr>
             )}
-
             {categories?.data?.map((item:any) => (
               <tr key={item._id}>
                 <td>
@@ -202,9 +193,7 @@ const Categories = () => {
                     }}
                   />
                 </td>
-
                 <td style={{ fontSize: "13px" }}>{item.title}</td>
-
                 <td>
                   <span
                     style={{
@@ -221,7 +210,6 @@ const Categories = () => {
                     {item.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
-
                 <td style={{ textAlign: "center" }}>
                   <div
                     style={{
@@ -246,12 +234,10 @@ const Categories = () => {
           </tbody>
         </Table>
 
-        {/* Modal */}
         <Modal isOpen={modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>
             {editId ? "Edit Category" : "Add Category"}
           </ModalHeader>
-
           <ModalBody>
             <FormGroup>
               <Label>Title</Label>
@@ -261,12 +247,10 @@ const Categories = () => {
                 onChange={handleChange}
               />
             </FormGroup>
-
             <FormGroup>
               <Label>Upload Image</Label>
               <Input type="file" onChange={handleImage} />
             </FormGroup>
-
             {preview && (
               <img
                 src={preview}
@@ -277,7 +261,6 @@ const Categories = () => {
                 }}
               />
             )}
-
             <FormGroup>
               <Label>Status</Label>
               <Input
@@ -291,7 +274,6 @@ const Categories = () => {
               </Input>
             </FormGroup>
           </ModalBody>
-
           <ModalFooter>
             <Button onClick={handleSubmit} disabled={loading}>
               {loading ? "Saving..." : "Save"}

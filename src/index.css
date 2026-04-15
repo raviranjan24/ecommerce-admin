@@ -192,7 +192,6 @@ tbody, td, tfoot, th, thead, tr{
   font-size: 14px !important;
 }
 
-
 .dashboard-card {
   display: flex;
   justify-content: space-between;
@@ -210,7 +209,6 @@ tbody, td, tfoot, th, thead, tr{
   box-shadow: 0 12px 25px rgba(0,0,0,0.15);
 }
 
-/* TEXT */
 .card-content p {
   margin: 0;
   font-size: 13px;
@@ -224,7 +222,6 @@ tbody, td, tfoot, th, thead, tr{
   font-weight: bold;
 }
 
-/* ICON */
 .card-icon {
   width: 55px;
   height: 55px;
@@ -236,7 +233,6 @@ tbody, td, tfoot, th, thead, tr{
   font-size: 22px;
 }
 
-/* GRADIENT COLORS */
 .gradient-purple {
   background: linear-gradient(135deg, #667eea, #764ba2);
 }

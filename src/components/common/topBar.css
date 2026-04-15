@@ -7,7 +7,6 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Left Section */
 .topbar-left {
   display: flex;
   align-items: center;
@@ -17,7 +16,6 @@
   font-weight: 500;
 }
 
-/* Right Section */
 .topbar-right {
   display: flex;
   align-items: center;
@@ -25,7 +23,6 @@
   cursor: pointer;
 }
 
-/* Icons */
 .topbar-icon {
   font-size: 14px;
   color: #555;

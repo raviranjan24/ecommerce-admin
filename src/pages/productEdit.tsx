@@ -13,7 +13,6 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [preview, setPreview] = useState<any>({});
-
   const [form, setForm] = useState<any>({
     title: "",
     description: "",
@@ -36,16 +35,11 @@ const EditProduct = () => {
     image5: null,
   });
 
-  // ===========================
-  // 🔥 FETCH DATA
-  // ===========================
   const fetchProduct = async () => {
     try {
       setLoading(true);
-
       const res = await axiosInstance.get(`/api/v1/products/single/${id}`);
       const p = res?.data?.data?.product;
-
       setForm({
         title: p.title || "",
         description: p.description || "",
@@ -62,13 +56,10 @@ const EditProduct = () => {
         length: p.dimensions_and_weight?.length?.replace(" cm", "") || "",
         weight: p.dimensions_and_weight?.weight?.replace(" kg", "") || "",
       });
-
-      // Existing image preview
       setPreview({
         image1: p.images?.main || "",
         image2: p.images?.hover || "",
       });
-
     } catch (err) {
       console.error(err);
     } finally {
@@ -86,61 +77,44 @@ const EditProduct = () => {
     fetchCategories();
   }, []);
 
-  // ===========================
-  // HANDLERS
-  // ===========================
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleMultiSelect = (value: string, key: string) => {
     let arr = form[key];
-
     if (arr.includes(value)) {
       arr = arr.filter((v: string) => v !== value);
     } else {
       arr.push(value);
     }
-
     setForm({ ...form, [key]: [...arr] });
   };
 
   const handleImage = (e: any, key: string) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setForm({ ...form, [key]: file });
-
     setPreview({
       ...preview,
       [key]: URL.createObjectURL(file),
     });
   };
 
-  // ===========================
-  // UPDATE API
-  // ===========================
   const handleUpdate = async () => {
     try {
       setLoading(true);
-
       const data = new FormData();
-
-      // BASIC
       data.append("title", form.title);
       data.append("description", form.description);
       data.append("category", form.category);
       data.append("regular_price", form.regular_price);
       data.append("currency", "INR");
-
       const discount =
         ((form.regular_price - form.sell_price) /
           form.regular_price) *
         100;
-
       data.append("discount_percentage", discount.toFixed(0));
-
-      // INVENTORY
       data.append(
         "inventory",
         JSON.stringify({
@@ -149,8 +123,6 @@ const EditProduct = () => {
           stock_quantity: Number(form.stock_quantity),
         })
       );
-
-      // VARIANTS
       data.append(
         "variants",
         JSON.stringify({
@@ -162,16 +134,12 @@ const EditProduct = () => {
           depth: form.depth,
         })
       );
-
-      // DELIVERY
       data.append(
         "delivery",
         JSON.stringify({
           estimated_delivery: "3-5 business days",
         })
       );
-
-      // DIMENSIONS
       data.append(
         "dimensions_and_weight",
         JSON.stringify({
@@ -181,20 +149,15 @@ const EditProduct = () => {
           weight: form.weight + " kg",
         })
       );
-
-      // IMAGES
       ["image1", "image2", "image3", "image4", "image5"].forEach((key) => {
         if (form[key]) data.append(key, form[key]);
       });
-
       await axiosInstance.put(`/api/v1/products/update/${id}`, data);
-
-      alert("Product Updated ✅");
+      alert("Product Updated");
       navigate("/products");
-
     } catch (err) {
       console.error(err);
-      alert("Error ❌");
+      alert("Error");
     } finally {
       setLoading(false);
     }
@@ -204,12 +167,10 @@ const EditProduct = () => {
     <Card className="shadow-sm border-0">
       <CardBody>
         <h5>Edit Product</h5>
-
         <Row>
           <Col md={6}>
             <Input name="title" value={form.title} onChange={handleChange} />
           </Col>
-
           <Col md={6}>
             <Input type="select" name="category" value={form.category} onChange={handleChange}>
               <option>Select Category</option>
@@ -247,7 +208,6 @@ const EditProduct = () => {
           <Col md={6}><Input name="weight" value={form.weight} onChange={handleChange} placeholder="Weight" /></Col>
           <Col md={6}><Input name="depth" value={form.depth} onChange={handleChange} placeholder="Depth" /></Col>
 
-          {/* COLORS */}
           <Col md={6}>
             {COLORS.map((c) => (
               <span key={c} onClick={() => handleMultiSelect(c, "colors")}>
@@ -256,7 +216,6 @@ const EditProduct = () => {
             ))}
           </Col>
 
-          {/* SIZES */}
           <Col md={6}>
             {SIZES.map((s) => (
               <span key={s} onClick={() => handleMultiSelect(s, "sizes")}>
@@ -265,7 +224,6 @@ const EditProduct = () => {
             ))}
           </Col>
 
-          {/* IMAGES */}
           {["image1", "image2", "image3", "image4", "image5"].map((key) => (
             <Col md={4} key={key}>
               <Input type="file" onChange={(e) => handleImage(e, key)} />

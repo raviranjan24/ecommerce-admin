@@ -53,7 +53,6 @@ const StaticPage = () => {
         <div className="table-header">
           <div className="table-title">Static Pages CMS</div>
         </div>
-
         <Row>
           <Col md={4}>
             <FormGroup>

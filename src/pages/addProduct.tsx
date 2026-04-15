@@ -15,7 +15,6 @@ const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 const AddProduct = () => {
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -56,67 +55,44 @@ const AddProduct = () => {
     fetchCategories();
   }, []);
 
-  // ===========================
-  // HANDLE INPUT
-  // ===========================
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ===========================
-  // MULTI SELECT (COLOR/SIZE)
-  // ===========================
   const handleMultiSelect = (value: string, key: string) => {
     let arr = form[key];
-
     if (arr.includes(value)) {
       arr = arr.filter((v: string) => v !== value);
     } else {
       arr.push(value);
     }
-
     setForm({ ...form, [key]: [...arr] });
   };
 
-  // ===========================
-  // IMAGE HANDLER
-  // ===========================
   const handleImage = (e: any, key: string) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setForm({ ...form, [key]: file });
-
     setPreview({
       ...preview,
       [key]: URL.createObjectURL(file),
     });
   };
 
-  // ===========================
-  // SUBMIT
-  // ===========================
   const handleSubmit = async () => {
     try {
       setLoading(true);
-
       const data = new FormData();
-
-      // BASIC
       data.append("title", form.title);
       data.append("description", form.description);
       data.append("category", form.category);
       data.append("regular_price", form.regular_price);
       data.append("currency", "INR");
-
       const discount =
         ((form.regular_price - form.sell_price) /
           form.regular_price) *
         100;
-
       data.append("discount_percentage", discount.toFixed(0));
-
-      // INVENTORY
       data.append(
         "inventory",
         JSON.stringify({
@@ -125,8 +101,6 @@ const AddProduct = () => {
           stock_quantity: Number(form.stock_quantity),
         })
       );
-
-      // VARIANTS
       data.append(
         "variants",
         JSON.stringify({
@@ -138,16 +112,12 @@ const AddProduct = () => {
           depth: form.depth,
         })
       );
-
-      // DELIVERY
       data.append(
         "delivery",
         JSON.stringify({
           estimated_delivery: "3-5 business days",
         })
       );
-
-      // DIMENSIONS
       data.append(
         "dimensions_and_weight",
         JSON.stringify({
@@ -157,20 +127,15 @@ const AddProduct = () => {
           weight: form.weight + " kg",
         })
       );
-
-      // IMAGES
       ["image1", "image2", "image3", "image4", "image5"].forEach((key) => {
         if (form[key]) data.append(key, form[key]);
       });
-
       await axiosInstance.post("/api/v1/products/add", data);
-
-      alert("Product Added ✅");
+      alert("Product Added");
       navigate("/products");
-
     } catch (err) {
       console.error(err);
-      alert("Error ❌");
+      alert("Error");
     } finally {
       setLoading(false);
     }
@@ -180,14 +145,10 @@ const AddProduct = () => {
     <Card className="shadow-sm border-0">
       <CardBody>
         <h5>Add Product</h5>
-
         <Row>
-          {/* TITLE */}
           <Col md={6}>
             <Input placeholder="Title" name="title" onChange={handleChange} />
           </Col>
-
-          {/* CATEGORY DROPDOWN */}
           <Col md={6}>
             <Input
               type="select"
@@ -202,8 +163,6 @@ const AddProduct = () => {
               ))}
             </Input>
           </Col>
-
-          {/* DESCRIPTION */}
           <Col md={12} className="mt-2">
             <Input
               type="textarea"
@@ -212,8 +171,7 @@ const AddProduct = () => {
               onChange={handleChange}
             />
           </Col>
-
-          {/* PRICE */}
+          
           <Col md={6} className="mt-2">
             <Input placeholder="Regular Price" name="regular_price" onChange={handleChange} />
           </Col>
@@ -222,7 +180,7 @@ const AddProduct = () => {
             <Input placeholder="Sell Price" name="sell_price" onChange={handleChange} />
           </Col>
 
-          {/* SKU & STOCK */}
+          
           <Col md={6} className="mt-2">
             <Input placeholder="SKU" name="sku" onChange={handleChange} />
           </Col>
@@ -231,7 +189,7 @@ const AddProduct = () => {
             <Input placeholder="Stock Quantity" name="stock_quantity" onChange={handleChange} />
           </Col>
 
-          {/* COLORS */}
+          
           <Col md={6} className="mt-3">
             <label>Colors</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -258,7 +216,7 @@ const AddProduct = () => {
             </div>
           </Col>
 
-          {/* SIZES */}
+          
           <Col md={6} className="mt-3">
             <label>Sizes</label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -284,7 +242,7 @@ const AddProduct = () => {
             </div>
           </Col>
 
-          {/* IMAGES */}
+          
           {["image1", "image2", "image3", "image4", "image5"].map((key) => (
             <Col md={4} className="mt-3" key={key}>
               <Input type="file" onChange={(e) => handleImage(e, key)} />

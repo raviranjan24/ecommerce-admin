@@ -22,25 +22,16 @@ const Customers = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ===========================
-  // 🔥 FETCH USERS
-  // ===========================
   const fetchUsers = async () => {
     try {
       setLoading(true);
-
       const res = await axiosInstance.get("/api/user/all");
-
       const users = res?.data?.data?.users || [];
-
-      // Add UI status (since API not giving)
       const mapped = users.map((u: any) => ({
         ...u,
         status: "active", // default
       }));
-
       setCustomers(mapped);
-
     } catch (err) {
       console.error(err);
     } finally {
@@ -52,9 +43,6 @@ const Customers = () => {
     fetchUsers();
   }, []);
 
-  // ===========================
-  // 🔁 TOGGLE (UI ONLY)
-  // ===========================
   const toggleStatus = (id: string) => {
     const updated = customers.map((c) =>
       c._id === id
@@ -64,23 +52,16 @@ const Customers = () => {
         }
         : c
     );
-
     setCustomers(updated);
   };
 
-  // ===========================
-  // ❌ DELETE (UI ONLY)
-  // ===========================
+
   const handleDelete = (id: string) => {
     if (!window.confirm("Delete this user?")) return;
-
     const updated = customers.filter((c) => c._id !== id);
     setCustomers(updated);
   };
 
-  // ===========================
-  // 📊 STATS
-  // ===========================
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter(c => c.status === "active").length;
   const disabledCustomers = customers.filter(c => c.status === "disabled").length;
@@ -88,7 +69,6 @@ const Customers = () => {
 
   return (
     <>
-      {/* 🔥 STATS */}
       <Row className="mb-4 g-3">
         <Col md="3">
           <div className="dashboard-card gradient-blue">
@@ -139,18 +119,14 @@ const Customers = () => {
         </Col>
       </Row>
 
-      {/* TABLE */}
       <Card className="shadow-sm border-0">
         <CardBody>
           <h5 className="mb-3">Customers List</h5>
-
-          {/* Loader */}
           {loading && (
             <div style={{ textAlign: "center", padding: 10 }}>
               <div className="spinner-border text-primary" />
             </div>
           )}
-
           <Table bordered hover responsive>
             <thead>
               <tr>
@@ -162,7 +138,6 @@ const Customers = () => {
                 <th style={{ textAlign: "center" }}>Action</th>
               </tr>
             </thead>
-
             <tbody>
               {!loading && customers.length === 0 && (
                 <tr>
@@ -171,7 +146,6 @@ const Customers = () => {
                   </td>
                 </tr>
               )}
-
               {customers.map((c) => (
                 <tr key={c._id}>
                   {/* PROFILE */}
@@ -185,12 +159,9 @@ const Customers = () => {
                       }}
                     />
                   </td>
-
                   <td>{c.name}</td>
                   <td style={{ fontSize: "12px" }}>{c.email}</td>
                   <td>{c.phone}</td>
-
-                  {/* STATUS */}
                   <td>
                     <span
                       style={{
@@ -210,8 +181,6 @@ const Customers = () => {
                       {c.status}
                     </span>
                   </td>
-
-                  {/* ACTION */}
                   <td style={{ textAlign: "center" }}>
                     {c.status === "active" ? (
                       <FaToggleOn
