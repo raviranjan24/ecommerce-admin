@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import { Card, CardBody, Row, Col, Input, Button } from "reactstrap";
+import { toast } from "react-toastify";
 
 const COLORS = [
   "bg-red",
@@ -131,7 +132,7 @@ const AddProduct = () => {
         if (form[key]) data.append(key, form[key]);
       });
       await axiosInstance.post("/api/v1/products/add", data);
-      alert("Product Added");
+      toast.success("Product Added Successfully");
       navigate("/products");
     } catch (err) {
       console.error(err);

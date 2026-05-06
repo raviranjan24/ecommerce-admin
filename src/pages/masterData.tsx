@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axiosInstance from "../utils/axios";
+
 import {
   Card,
   CardBody,
@@ -9,149 +11,168 @@ import {
   FormGroup,
   Label,
   Input,
+  Spinner,
 } from "reactstrap";
+import { toast } from "react-toastify";
 
 const MasterData = () => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    logo: null as File | null,
-    email1: "",
-    email2: "",
-    contact1: "",
-    contact2: "",
+    primaryEmail: "",
+    secondaryEmail: "",
+    primaryPhone: "",
+    secondaryPhone: "",
     address: "",
   });
 
-  const [preview, setPreview] = useState<string | null>(null);
-
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleFileChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, logo: file });
-      setPreview(URL.createObjectURL(file));
+  const fetchMasterData = async () => {
+    try {
+      setLoading(true);
+      const res = await axiosInstance.get("/api/v1/master");
+      if (res?.data?.success) {
+        const data = res?.data?.data;
+        setFormData({
+          primaryEmail: data?.primaryEmail || "",
+          secondaryEmail: data?.secondaryEmail || "",
+          primaryPhone: data?.primaryPhone || "",
+          secondaryPhone: data?.secondaryPhone || "",
+          address: data?.address || "",
+        });
+      }
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSubmit = (e: any) => {
+  useEffect(() => {
+    fetchMasterData();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = new FormData();
-    data.append("logo", formData.logo as Blob);
-    data.append("email1", formData.email1);
-    data.append("email2", formData.email2);
-    data.append("contact1", formData.contact1);
-    data.append("contact2", formData.contact2);
-    data.append("address", formData.address);
-    console.log("Submitted Data:", formData);
-    // 👉 API Call Here
-    // fetch("/api/master-data", {
-    //   method: "POST",
-    //   body: data,
-    // });
+    try {
+      setLoading(true);
+      const payload = {
+        primaryEmail: formData.primaryEmail,
+        secondaryEmail: formData.secondaryEmail,
+        primaryPhone: formData.primaryPhone,
+        secondaryPhone: formData.secondaryPhone,
+        address: formData.address,
+      };
+      await axiosInstance.put("/api/v1/master", payload);
+      toast.success("Master Data Saved Successfully");
+    } catch (err) {
+      console.error("Submit Error:", err);
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Card className="custom-card">
+    <Card className="custom-card border-0 shadow-sm">
       <CardBody>
-        <div className="table-header">
-          <div className="table-title">Master Settings</div>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h4 className="mb-0 fw-bold">Master Settings</h4>
         </div>
         <Form onSubmit={handleSubmit}>
           <Row>
-            <Col md={4}>
+            <Col md={6}>
               <FormGroup>
-                <Label>Upload Logo</Label>
-                <Input type="file" onChange={handleFileChange} />
-                {preview && (
-                  <div style={{ marginTop: "10px" }}>
-                    <img
-                      src={preview}
-                      alt="preview"
-                      style={{
-                        width: "120px",
-                        height: "120px",
-                        objectFit: "contain",
-                        border: "1px solid #ddd",
-                        padding: "5px",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  </div>
-                )}
-              </FormGroup>
-            </Col>
-            <Col md={4}>
-              <FormGroup>
-                <Label>Email 1</Label>
+                <Label className="fw-semibold">Primary Email</Label>
                 <Input
                   type="email"
-                  name="email1"
-                  value={formData.email1}
+                  name="primaryEmail"
+                  value={formData.primaryEmail}
                   onChange={handleChange}
                   placeholder="Enter primary email"
                 />
               </FormGroup>
             </Col>
-            <Col md={4}>
+            <Col md={6}>
               <FormGroup>
-                <Label>Email 2</Label>
+                <Label className="fw-semibold">Secondary Email</Label>
                 <Input
                   type="email"
-                  name="email2"
-                  value={formData.email2}
+                  name="secondaryEmail"
+                  value={formData.secondaryEmail}
                   onChange={handleChange}
                   placeholder="Enter secondary email"
                 />
               </FormGroup>
             </Col>
-            <Col md={4}>
+            <Col md={6}>
               <FormGroup>
-                <Label>Contact 1</Label>
+                <Label className="fw-semibold">Primary Phone</Label>
                 <Input
                   type="text"
-                  name="contact1"
-                  value={formData.contact1}
+                  name="primaryPhone"
+                  value={formData.primaryPhone}
                   onChange={handleChange}
-                  placeholder="Enter primary contact"
+                  placeholder="Enter primary phone"
                 />
               </FormGroup>
             </Col>
-            <Col md={4}>
+            <Col md={6}>
               <FormGroup>
-                <Label>Contact 2</Label>
+                <Label className="fw-semibold">Secondary Phone</Label>
                 <Input
                   type="text"
-                  name="contact2"
-                  value={formData.contact2}
+                  name="secondaryPhone"
+                  value={formData.secondaryPhone}
                   onChange={handleChange}
-                  placeholder="Enter secondary contact"
+                  placeholder="Enter secondary phone"
                 />
               </FormGroup>
             </Col>
             <Col md={12}>
               <FormGroup>
-                <Label>Address</Label>
+                <Label className="fw-semibold">Address</Label>
+
                 <Input
                   type="textarea"
+                  rows={4}
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  rows={3}
                   placeholder="Enter full address"
                 />
               </FormGroup>
             </Col>
           </Row>
-          <div style={{ textAlign: "right" }}>
+
+          <div className="text-end">
             <Button
               type="submit"
-              className="btn btn-primary"
-              style={{ background: "#7e6bef" }}
+              color="primary"
+              disabled={loading}
+              style={{
+                background: "#7e6bef",
+                border: "none",
+                padding: "10px 24px",
+                borderRadius: "8px",
+              }}
             >
-              Save Changes
+              {loading ? (
+                <>
+                  <Spinner size="sm" /> Saving...
+                </>
+              ) : (
+                "Update Changes"
+              )}
             </Button>
           </div>
         </Form>

@@ -20,6 +20,7 @@ const StaticPage = () => {
       about: "This is About Us content...",
       privacy: "Privacy policy content...",
       terms: "Terms & Conditions content...",
+      refund: "Refund policy content...",
     };
 
     setContent(dummyData[page]);
@@ -65,6 +66,7 @@ const StaticPage = () => {
                 <option value="about">About Us</option>
                 <option value="privacy">Privacy Policy</option>
                 <option value="terms">Terms & Conditions</option>
+                <option value="refund">Refund Policy</option>
               </Input>
             </FormGroup>
           </Col>
