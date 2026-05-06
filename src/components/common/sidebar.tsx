@@ -76,16 +76,16 @@ const Sidebar = () => {
         { name: "Home Add", path: "/home-add" },
       ],
     },
-    {
-      name: "Pages",
-      icon: <FaList />,
-      children: [
-        { name: "About Us", path: "/static-page" },
-        { name: "Privacy Policy", path: "/static-page" },
-        { name: "Terms & Conditions", path: "/static-page" },
-        { name: "Refund Policy", path: "/static-page" },
-      ],
-    },
+    // {
+    //   name: "Pages",
+    //   icon: <FaList />,
+    //   children: [
+    //     { name: "About Us", path: "/static-page" },
+    //     { name: "Privacy Policy", path: "/static-page" },
+    //     { name: "Terms & Conditions", path: "/static-page" },
+    //     { name: "Refund Policy", path: "/static-page" },
+    //   ],
+    // },
     {
       name: "Master Data",
       icon: <FaList />,
