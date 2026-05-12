@@ -248,3 +248,27 @@ tbody, td, tfoot, th, thead, tr{
 .gradient-green {
   background: linear-gradient(135deg, #11998e, #38ef7d);
 }
+
+.gradient-blue {
+  background: linear-gradient(135deg, #36d1dc, #5b86e5);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #654ea3, #8f94fb);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+}
+
+.gradient-dark {
+  background: linear-gradient(135deg, #232526, #414345);
+}

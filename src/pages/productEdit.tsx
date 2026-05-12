@@ -20,7 +20,6 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [preview, setPreview] = useState<any>({});

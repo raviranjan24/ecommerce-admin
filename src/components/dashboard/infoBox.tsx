@@ -1,227 +1,193 @@
 import { useEffect, useState } from "react";
+import { Col } from "reactstrap";
+
 import axiosInstance from "../../utils/axios";
-import { Col, Card, CardBody } from "reactstrap";
+
 import {
-  FaShoppingCart,
-  FaTimesCircle,
-  FaSyncAlt,
+  FaUsers,
+  FaUserCheck,
+  FaUserTimes,
+  FaUserPlus,
+  FaShoppingBag,
+  FaMoneyBillWave,
 } from "react-icons/fa";
-import { FaIndianRupeeSign } from "react-icons/fa6";
 
 const InfoBox = () => {
-  const [stats, setStats] = useState({
-    pending: 0,
-    cancelled: 0,
-    processing: 0,
-    todayIncome: 0,
-  });
 
-  const [loading, setLoading] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
-  // ===========================
-  // 🔥 FETCH ORDERS + CALCULATE
-  // ===========================
-  const fetchStats = async () => {
+  // =========================
+  // FETCH USERS
+  // =========================
+  const fetchUsers = async () => {
     try {
-      setLoading(true);
+
+      const res = await axiosInstance.get("/api/user/all");
+
+      const users = res?.data?.data?.users || [];
+
+      const mapped = users.map((u: any) => ({
+        ...u,
+        status: "active",
+      }));
+
+      setCustomers(mapped);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // =========================
+  // FETCH ORDERS
+  // =========================
+  const fetchOrders = async () => {
+    try {
 
       const res = await axiosInstance.post("/api/order/list");
 
-      const orders = res?.data?.orders || [];
-
-      const today = new Date().toDateString();
-
-      let pending = 0;
-      let cancelled = 0;
-      let processing = 0;
-      let todayIncome = 0;
-
-      orders.forEach((o: any) => {
-        // STATUS COUNT
-        if (o.status === "Pending") pending++;
-        if (o.status === "Cancelled") cancelled++;
-        if (o.status === "Processing") processing++;
-
-        // TODAY INCOME
-        const orderDate = new Date(o.createdAt).toDateString();
-
-        if (orderDate === today) {
-          todayIncome += o.total || 0;
-        }
-      });
-
-      setStats({
-        pending,
-        cancelled,
-        processing,
-        todayIncome,
-      });
+      setOrders(res?.data?.orders || []);
 
     } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    fetchStats();
+    fetchUsers();
+    fetchOrders();
   }, []);
 
-  // ===========================
-  // CARD DATA (DYNAMIC)
-  // ===========================
-  const cardData = [
-    {
-      title: "ORDER PENDING",
-      value: stats.pending,
-      color: "#7e6bef",
-      icon: <FaShoppingCart size={24} />,
-    },
-    {
-      title: "ORDER CANCEL",
-      value: stats.cancelled,
-      color: "#ff3b3b",
-      icon: <FaTimesCircle size={24} />,
-    },
-    {
-      title: "ORDER PROCESS",
-      value: stats.processing,
-      color: "#2fa4c6",
-      icon: <FaSyncAlt size={24} />,
-    },
-    {
-      title: "TODAY INCOME",
-      value: `₹${stats.todayIncome}`,
-      color: "#3ac569",
-      icon: <FaIndianRupeeSign size={24} />,
-    },
-  ];
+  // =========================
+  // CALCULATIONS
+  // =========================
+
+  const totalCustomers = customers.length;
+
+  const activeCustomers = customers.filter(
+    (c) => c.status === "active"
+  ).length;
+
+  const disabledCustomers = customers.filter(
+    (c) => c.status === "disabled"
+  ).length;
+
+  const newCustomers = customers.slice(0, 5).length;
+
+  const totalOrders = orders.length;
+
+  const totalRevenue = orders.reduce(
+    (acc, item) => acc + Number(item.total || 0),
+    0
+  );
 
   return (
     <>
-      {cardData.map((item, index) => (
-        <Col md="3" key={index}>
-          <Card
-            style={{
-              backgroundColor: item.color,
-              color: "#fff",
-              borderRadius: "10px",
-              border: "none",
-            }}
-          >
-            <CardBody
-              className="d-flex justify-content-between align-items-center"
-              style={{ padding: "20px" }}
-            >
-              <div>
-                <div style={{ fontSize: "14px", opacity: 0.9 }}>
-                  {item.title}
-                </div>
+      {/* ================= TOTAL USERS ================= */}
 
-                <div style={{ fontSize: "28px", fontWeight: "bold" }}>
-                  {loading ? "..." : item.value}
-                </div>
-              </div>
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-blue">
 
-              <div
-                style={{
-                  background: "rgba(255,255,255,0.2)",
-                  borderRadius: "50%",
-                  padding: "15px",
-                }}
-              >
-                {item.icon}
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-      ))}
+          <div className="card-content">
+            <p>TOTAL USERS</p>
+            <h2>{totalCustomers}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaUsers />
+          </div>
+
+        </div>
+      </Col>
+
+      {/* ================= ACTIVE USERS ================= */}
+
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-green">
+
+          <div className="card-content">
+            <p>ACTIVE USERS</p>
+            <h2>{activeCustomers}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaUserCheck />
+          </div>
+
+        </div>
+      </Col>
+
+      {/* ================= DISABLED USERS ================= */}
+
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-red">
+
+          <div className="card-content">
+            <p>DISABLED USERS</p>
+            <h2>{disabledCustomers}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaUserTimes />
+          </div>
+
+        </div>
+      </Col>
+
+      {/* ================= NEW USERS ================= */}
+
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-purple">
+
+          <div className="card-content">
+            <p>NEW USERS</p>
+            <h2>{newCustomers}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaUserPlus />
+          </div>
+
+        </div>
+      </Col>
+
+      {/* ================= TOTAL ORDERS ================= */}
+
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-orange">
+
+          <div className="card-content">
+            <p>TOTAL ORDERS</p>
+            <h2>{totalOrders}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaShoppingBag />
+          </div>
+
+        </div>
+      </Col>
+
+      {/* ================= TOTAL REVENUE ================= */}
+
+      <Col lg="4" md="6" sm="12" className="mb-4">
+        <div className="dashboard-card gradient-dark">
+
+          <div className="card-content">
+            <p>TOTAL REVENUE</p>
+            <h2>₹{totalRevenue}</h2>
+          </div>
+
+          <div className="card-icon">
+            <FaMoneyBillWave />
+          </div>
+
+        </div>
+      </Col>
+
     </>
   );
 };
 
 export default InfoBox;
-
-// import {Col, Card, CardBody } from "reactstrap";
-// import {
-//     FaShoppingCart,
-//     FaTimesCircle,
-//     FaSyncAlt
-// } from "react-icons/fa";
-// import { FaIndianRupeeSign } from "react-icons/fa6";
-
-// const cardData = [
-//     {
-//         title: "ORDER PENDING",
-//         value: 2,
-//         color: "#7e6bef",
-//         icon: <FaShoppingCart size={24} />,
-//     },
-//     {
-//         title: "ORDER CANCEL",
-//         value: 0,
-//         color: "#ff3b3b",
-//         icon: <FaTimesCircle size={24} />,
-//     },
-//     {
-//         title: "ORDER PROCESS",
-//         value: 5,
-//         color: "#2fa4c6",
-//         icon: <FaSyncAlt size={24} />,
-//     },
-//     {
-//         title: "TODAY INCOME",
-//         value: "9568.00",
-//         color: "#3ac569",
-//         icon: <FaIndianRupeeSign size={24} />,
-//     },
-// ];
-
-// const InfoBox = () => {
-//     return (
-//         <>
-//             {cardData.map((item, index) => (
-//                 <Col md="3" key={index}>
-//                     <Card
-//                         style={{
-//                             backgroundColor: item.color,
-//                             color: "#fff",
-//                             borderRadius: "10px",
-//                             border: "none",
-//                         }}
-//                     >
-//                         <CardBody
-//                             className="d-flex justify-content-between align-items-center"
-//                             style={{ padding: "20px" }}
-//                         >
-//                             <div>
-//                                 <div style={{ fontSize: "14px", opacity: 0.9 }}>
-//                                     {item.title}
-//                                 </div>
-//                                 <div style={{ fontSize: "28px", fontWeight: "bold" }}>
-//                                     {item.value}
-//                                 </div>
-//                             </div>
-
-//                             <div
-//                                 style={{
-//                                     background: "rgba(255,255,255,0.2)",
-//                                     borderRadius: "50%",
-//                                     padding: "15px",
-//                                     display: "flex",
-//                                     alignItems: "center",
-//                                     justifyContent: "center",
-//                                 }}
-//                             >
-//                                 {item.icon}
-//                             </div>
-//                         </CardBody>
-//                     </Card>
-//                 </Col>
-//             ))}
-//         </>
-//     );
-// };
-
-// export default InfoBox;

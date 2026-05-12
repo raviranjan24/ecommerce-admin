@@ -66,8 +66,8 @@ const Sidebar = () => {
       ],
     },
     { name: "Customers", path: "/customers", icon: <FaUsers /> },
-    { name: "Coupon", path: "/coupon", icon: <FaStore /> },
-    { name: "Invoices", path: "/invoices", icon: <FaStore /> },
+    // { name: "Coupon", path: "/coupon", icon: <FaStore /> },
+    // { name: "Invoices", path: "/invoices", icon: <FaStore /> },
     {
       name: "Home",
       icon: <FaTachometerAlt />,
