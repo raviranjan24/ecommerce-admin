@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 
@@ -59,12 +59,23 @@ const EditProduct = () => {
       .replace(/^-+|-+$/g, "");
   };
 
+  // const fetchCategories = async () => {
+  //   try {
+  //     const res = await axiosInstance.get(
+  //       "/api/category/admin/list"
+  //     );
+
+  //     setCategories(res?.data?.data || []);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
   const fetchCategories = async () => {
     try {
       const res = await axiosInstance.get(
-        "/api/category/admin/list"
+        "/api/v1/header-categories"
       );
-
       setCategories(res?.data?.data || []);
     } catch (err) {
       console.error(err);
@@ -176,8 +187,8 @@ const EditProduct = () => {
 
       ...(name === "title"
         ? {
-            slug: generateSlug(value),
-          }
+          slug: generateSlug(value),
+        }
         : {}),
     }));
   };
@@ -390,7 +401,7 @@ const EditProduct = () => {
 
       toast.error(
         err?.response?.data?.message ||
-          "Something went wrong"
+        "Something went wrong"
       );
     } finally {
       setLoading(false);
@@ -451,15 +462,81 @@ const EditProduct = () => {
                     Select Category
                   </option>
 
-                  {categories.map((cat) => (
-                    <option
-                      key={cat._id}
-                      value={cat._id}
-                    >
-                      {cat.title}
-                    </option>
+                  {categories.map((cat: any) => (
+                    <React.Fragment key={cat._id}>
+
+                      {/* PARENT */}
+                      <option
+                        disabled
+                        style={{
+                          fontWeight: 700,
+                          background: "#f8fafc",
+                          color: "#111827",
+                        }}
+                      >
+                        📁 {cat.title}
+                      </option>
+
+                      {/* CHILD */}
+                      {cat.columns?.map((column: any) => (
+                        <React.Fragment key={column._id}>
+
+                          <option
+                            disabled
+                            style={{
+                              fontWeight: 600,
+                              color: "#2563eb",
+                              background: "#eff6ff",
+                            }}
+                          >
+                            ├── {column.heading}
+                          </option>
+
+                          {/* SUB CHILD */}
+                          {column.links?.map((link: any) => (
+                            <option
+                              key={link._id}
+                              value={`${cat.title} > ${column.heading} > ${link.name}`}
+                            >
+                              │      └── {link.name}
+                            </option>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </React.Fragment>
                   ))}
                 </Input>
+
+                {form.category && (
+                  <div
+                    style={{
+                      marginTop: 10,
+                      padding: "10px",
+                      borderRadius: "8px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#64748b",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      Selected Category
+                    </div>
+
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        color: "#2563eb",
+                      }}
+                    >
+                      {form.category}
+                    </div>
+                  </div>
+                )}
               </FormGroup>
             </Col>
 
@@ -501,35 +578,56 @@ const EditProduct = () => {
             </Col>
 
             {/* DESCRIPTION */}
+            {/* DESCRIPTION */}
             <Col md={12} className="mb-4">
               <Label>Description</Label>
 
-              <CKEditor
-                editor={ClassicEditor as any}
-                data={form.description}
-                onReady={(editor: any) => {
-                  editor.editing.view.change(
-                    (writer: any) => {
-                      writer.setStyle(
-                        "height",
-                        "450px",
-                        editor.editing.view.document.getRoot()
-                      );
-                    }
-                  );
+              <div
+                style={{
+                  border: "1px solid #ddd",
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  minHeight: "300px",
                 }}
-                onChange={(
-                  editor: any
-                ) => {
-                  const data =
-                    editor.getData();
+              >
+                {typeof window !== "undefined" && (
+                  <CKEditor
+                    editor={ClassicEditor as any}
+                    data={form.description || ""}
+                    onReady={(editor: any) => {
+                      try {
+                        editor.editing.view.change(
+                          (writer: any) => {
+                            writer.setStyle(
+                              "height",
+                              "450px",
+                              editor.editing.view.document.getRoot()
+                            );
+                          }
+                        );
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                    onChange={(
+                      event: any,
+                      editor: any
+                    ) => {
+                      try {
+                        const data =
+                          editor.getData();
 
-                  setForm((prev: any) => ({
-                    ...prev,
-                    description: data,
-                  }));
-                }}
-              />
+                        setForm((prev: any) => ({
+                          ...prev,
+                          description: data,
+                        }));
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                  />
+                )}
+              </div>
             </Col>
 
             {/* PRICING */}
@@ -833,9 +931,8 @@ const EditProduct = () => {
                     <Label>
                       {index === 0
                         ? "Main Image"
-                        : `Image ${
-                            index + 1
-                          }`}
+                        : `Image ${index + 1
+                        }`}
                     </Label>
 
                     <Input
@@ -866,7 +963,7 @@ const EditProduct = () => {
                         <img
                           src={
                             preview[
-                              key
+                            key
                             ]
                           }
                           alt=""

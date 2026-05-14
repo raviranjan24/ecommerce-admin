@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axios";
 import {
@@ -56,9 +56,21 @@ const AddProduct = () => {
       .replace(/^-+|-+$/g, "");
   };
 
+  // const fetchCategories = async () => {
+  //   try {
+  //     const res = await axiosInstance.get("/api/category/admin/list");
+  //     setCategories(res?.data?.data || []);
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Failed to load categories");
+  //   }
+  // };
+
   const fetchCategories = async () => {
     try {
-      const res = await axiosInstance.get("/api/category/admin/list");
+      const res = await axiosInstance.get(
+        "/api/v1/header-categories"
+      );
       setCategories(res?.data?.data || []);
     } catch (err) {
       console.error(err);
@@ -315,6 +327,7 @@ const AddProduct = () => {
             </Col>
 
             {/* CATEGORY */}
+            {/* CATEGORY */}
             <Col md={6} className="mb-3">
               <FormGroup>
                 <Label>
@@ -326,15 +339,94 @@ const AddProduct = () => {
                   name="category"
                   value={form.category}
                   onChange={handleChange}
+                  style={{
+                    fontSize: "14px",
+                  }}
                 >
-                  <option value="">Select Category</option>
+                  <option value="">
+                    Select Category
+                  </option>
 
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.title}
-                    </option>
+                  {categories.map((cat: any) => (
+                    <React.Fragment key={cat._id}>
+
+                      {/* PARENT CATEGORY */}
+                      <option
+                        disabled
+                        style={{
+                          fontWeight: 700,
+                          background: "#f1f5f9",
+                          color: "#111827",
+                        }}
+                      >
+                        📁 {cat.title}
+                      </option>
+
+                      {/* CHILD CATEGORY */}
+                      {cat.columns?.map((column: any) => (
+                        <React.Fragment key={column._id}>
+
+                          <option
+                            disabled
+                            style={{
+                              fontWeight: 600,
+                              color: "#2563eb",
+                              background: "#eff6ff",
+                            }}
+                          >
+                            ├── {column.heading}
+                          </option>
+
+                          {/* SUB CHILD CATEGORY */}
+                          {column.links?.map((link: any) => (
+                            <option
+                              key={link._id}
+                              value={`${cat.title} > ${column.heading} > ${link.name}`}
+                              style={{
+                                color: "#374151",
+                              }}
+                            >
+                              │      └── {link.name}
+                            </option>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </React.Fragment>
                   ))}
                 </Input>
+
+                {/* SELECTED CATEGORY */}
+                {form.category && (
+                  <div
+                    style={{
+                      marginTop: 12,
+                      padding: "12px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#64748b",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      Selected Category
+                    </div>
+
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        color: "#2563eb",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {form.category}
+                    </div>
+                  </div>
+                )}
               </FormGroup>
             </Col>
 

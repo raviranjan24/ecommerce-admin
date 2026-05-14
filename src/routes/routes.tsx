@@ -18,6 +18,7 @@ import AddProduct from "../pages/addProduct";
 import DashboardLayout from "../components/layout/layout";
 import ProtectedRoute from "../utils/ProtectedRoute";
 import ProductEdit from "../pages/productEdit"; 
+import HeaderCategory from "../pages/headerCategory";
 
 const AppRoutes = () => {
   const isLogin = localStorage.getItem("isLogin");
@@ -52,6 +53,7 @@ const AppRoutes = () => {
           <Route path="home-add" element={<HomeAdd />} />
           <Route path="coupon" element={<CouponManagement />} />
           <Route path="invoices" element={<Invoices />} />
+          <Route path="HeaderCategory" element={<HeaderCategory/>} />
         </Route>
       </Route>
     </Routes>

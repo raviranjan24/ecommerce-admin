@@ -62,6 +62,7 @@ const Sidebar = () => {
       children: [
         { name: "All Products", path: "/products" },
         { name: "Add Product", path: "/add-product" },
+        {name:"Header Category",path:"/HeaderCategory"},
         { name: "Category", path: "/categories" },
       ],
     },

@@ -1,4 +1,4 @@
-import { Row, Col } from "reactstrap";
+import { Row} from "reactstrap";
 // import OrderList from "../components/dashboard/orderList";
 import InfoBox from "../components/dashboard/infoBox";
 
