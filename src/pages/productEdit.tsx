@@ -610,7 +610,6 @@ const EditProduct = () => {
                       }
                     }}
                     onChange={(
-                      event: any,
                       editor: any
                     ) => {
                       try {
