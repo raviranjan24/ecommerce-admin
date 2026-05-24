@@ -136,7 +136,7 @@ const Categories = () => {
           }}
         >
           <h5 style={{ margin: 0, fontWeight: 600 }}>
-            Categories
+            Home Categories Grid
           </h5>
 
           <Button

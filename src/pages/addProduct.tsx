@@ -381,7 +381,7 @@ const AddProduct = () => {
                           {column.links?.map((link: any) => (
                             <option
                               key={link._id}
-                              value={`${cat.title} > ${column.heading} > ${link.name}`}
+                              value={link._id}
                               style={{
                                 color: "#374151",
                               }}
@@ -486,9 +486,8 @@ const AddProduct = () => {
                       );
                     });
                   }}
-                  onChange={(editor: any) => {
+                  onChange={(event: any, editor: any) => {
                     const data = editor.getData();
-
                     setForm((prev: any) => ({
                       ...prev,
                       description: data,
