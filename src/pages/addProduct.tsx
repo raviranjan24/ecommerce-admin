@@ -486,7 +486,7 @@ const AddProduct = () => {
                       );
                     });
                   }}
-                  onChange={(event: any, editor: any) => {
+                  onChange={(editor: any) => {
                     const data = editor.getData();
                     setForm((prev: any) => ({
                       ...prev,
