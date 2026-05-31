@@ -78,9 +78,10 @@ const InfoBox = () => {
   const totalOrders = orders.length;
 
   const totalRevenue = orders.reduce(
-    (acc, item) => acc + Number(item.total || 0),
-    0
-  );
+  (acc, item) => acc + Number(item.total || 0),
+  0
+);
+const formattedRevenue = Math.round(totalRevenue).toLocaleString();
 
   return (
     <>
@@ -176,7 +177,7 @@ const InfoBox = () => {
 
           <div className="card-content">
             <p>TOTAL REVENUE</p>
-            <h2>₹{totalRevenue}</h2>
+            <h2>₹{formattedRevenue}</h2>
           </div>
 
           <div className="card-icon">

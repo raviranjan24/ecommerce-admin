@@ -60,25 +60,45 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const recordsPerPage = 10;
+
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord =
+    indexOfLastRecord - recordsPerPage;
+
+  const currentOrders = orders.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+
+  const totalPages = Math.ceil(
+    orders.length / recordsPerPage
+  );
+
   // =========================
   // VIEW SINGLE ORDER
   // =========================
-  const handleViewOrder = async (orderId: string) => {
-    try {
-      setViewLoading(true);
-      setViewModal(true);
+  const handleViewOrder = async (order: string) => {
+    setSelectedOrder(order);
+    setViewModal(true);
+    setViewLoading(false);
+    // try {
+    //   setViewLoading(true);
+    //   setViewModal(true);
 
-      const res = await axiosInstance.get(
-        `/api/order/${orderId}`
-      );
+    //   const res = await axiosInstance.get(
+    //     `/api/order/${orderId}`
+    //   );
 
-      setSelectedOrder(res?.data?.order);
-    } catch (err) {
-      console.log(err);
-      alert("Failed to fetch order details");
-    } finally {
-      setViewLoading(false);
-    }
+    //   setSelectedOrder(res?.data?.order);
+    // } catch (err) {
+    //   console.log(err);
+    //   alert("Failed to fetch order details");
+    // } finally {
+    //   setViewLoading(false);
+    // }
   };
 
   // =========================
@@ -199,7 +219,7 @@ const Orders = () => {
       <Row className="mb-4 g-3">
 
         <Col md="4">
-          <div className="dashboard-card gradient-yellow" style={{background:"linear-gradient(135deg, #911, #ef3838)"}}>
+          <div className="dashboard-card gradient-yellow" style={{ background: "linear-gradient(135deg, #911, #ef3838)" }}>
             <div className="card-content">
               <p>PENDING</p>
               <h2>{pendingOrders}</h2>
@@ -259,173 +279,203 @@ const Orders = () => {
               <div className="spinner-border text-primary"></div>
             </div>
           ) : (
-            <Table
-              responsive
-              hover
-              bordered
-              className="align-middle"
-            >
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Order No</th>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Payment</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {orders?.length > 0 ? (
-                  orders.map((item, index) => (
-                    <tr key={item._id}>
-
-                      <td>{index + 1}</td>
-
-                      <td>
-                        <strong>
-                          {item.orderNumber}
-                        </strong>
-                      </td>
-
-                      <td>
-                        {item?.shippingAddress?.fullName ||
-                          "N/A"}
-                        <br />
-
-                        <small>
-                          {item?.shippingAddress?.phone}
-                        </small>
-                      </td>
-
-                      <td>
-                        {item.items?.length} Items
-                      </td>
-
-                      <td>
-                        <strong>
-                          ₹{item.total}
-                        </strong>
-                      </td>
-
-                      <td>
-                        <div>
-                          <strong>
-                            {item.paymentMethod}
-                          </strong>
-                        </div>
-
-                        <small
-                          className={
-                            item.paymentStatus === "Paid"
-                              ? "text-success"
-                              : "text-danger"
-                          }
-                        >
-                          {item.paymentStatus}
-                        </small>
-                      </td>
-
-                      {/* STATUS */}
-                      <td>
-                        <div className="d-flex flex-column gap-2">
-
-                          <Badge
-                            color={getBadgeColor(item.status)}
-                            pill
-                            style={{
-                              width: "fit-content",
-                              fontSize: 12,
-                            }}
-                          >
-                            {item.status}
-                          </Badge>
-
-                          <select
-                            className="form-select form-select-sm"
-                            value={item.status}
-                            disabled={
-                              updatingId === item._id
-                            }
-                            onChange={(e) =>
-                              handleStatusChange(
-                                item._id,
-                                e.target.value
-                              )
-                            }
-                          >
-                            {STATUS_OPTIONS.map(
-                              (status) => (
-                                <option
-                                  key={status}
-                                  value={status}
-                                >
-                                  {status}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        </div>
-                      </td>
-
-                      <td>
-                        {new Date(
-                          item.createdAt
-                        ).toLocaleDateString()}
-                      </td>
-
-                      {/* ACTION */}
-                      <td>
-
-                        <div className="d-flex gap-2">
-
-                          {/* VIEW */}
-                          <Button
-                            color="primary"
-                            size="sm"
-                            onClick={() =>
-                              handleViewOrder(item.orderNumber)
-                            }
-                          >
-                            <FaEye />
-                          </Button>
-
-                          {/* DELETE */}
-                          <Button
-                            color="danger"
-                            size="sm"
-                            disabled={
-                              updatingId === item._id
-                            }
-                            onClick={() =>
-                              handleDelete(item._id)
-                            }
-                          >
-                            <FaTrash />
-                          </Button>
-
-                        </div>
-
-                      </td>
-
-                    </tr>
-                  ))
-                ) : (
+            <>
+              <Table
+                responsive
+                hover
+                bordered
+                className="align-middle"
+              >
+                <thead className="table-dark">
                   <tr>
-                    <td
-                      colSpan={9}
-                      className="text-center py-5"
-                    >
-                      No Orders Found
-                    </td>
+                    <th>#</th>
+                    <th>Order No</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
                   </tr>
-                )}
-              </tbody>
-            </Table>
+                </thead>
+
+                <tbody>
+                  {orders?.length > 0 ? (
+                    currentOrders.map((item, index) => (
+                      <tr key={item._id}>
+
+                        <td>{index + 1}</td>
+
+                        <td>
+                          <strong>
+                            {item.orderNumber}
+                          </strong>
+                        </td>
+
+                        <td>
+                          {item?.shippingAddress?.name ||
+                            item?.shippingAddress?.fullName ||
+                            "N/A"}
+                          <br />
+
+                          <small>
+                            {item?.shippingAddress?.phone}
+                          </small>
+                        </td>
+
+                        <td>
+                          {item.items?.length} Items
+                        </td>
+
+                        <td>
+                          <strong>
+                            ₹{item.total}
+                          </strong>
+                        </td>
+
+                        <td>
+                          <div>
+                            <strong>
+                              {item.paymentMethod}
+                            </strong>
+                          </div>
+
+                          <small
+                            className={
+                              item.paymentStatus === "Paid"
+                                ? "text-success"
+                                : "text-danger"
+                            }
+                          >
+                            {item.paymentStatus}
+                          </small>
+                        </td>
+
+                        {/* STATUS */}
+                        <td>
+                          <div className="d-flex flex-column gap-2">
+
+                            <Badge
+                              color={getBadgeColor(item.status)}
+                              pill
+                              style={{
+                                width: "fit-content",
+                                fontSize: 12,
+                              }}
+                            >
+                              {item.status}
+                            </Badge>
+
+                            <select
+                              className="form-select form-select-sm"
+                              value={item.status}
+                              disabled={
+                                updatingId === item._id
+                              }
+                              onChange={(e) =>
+                                handleStatusChange(
+                                  item._id,
+                                  e.target.value
+                                )
+                              }
+                            >
+                              {STATUS_OPTIONS.map(
+                                (status) => (
+                                  <option
+                                    key={status}
+                                    value={status}
+                                  >
+                                    {status}
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </div>
+                        </td>
+
+                        <td>
+                          {new Date(
+                            item.createdAt
+                          ).toLocaleDateString()}
+                        </td>
+
+                        {/* ACTION */}
+                        <td>
+
+                          <div className="d-flex gap-2">
+
+                            {/* VIEW */}
+                            <Button
+                              color="primary"
+                              size="sm"
+                              onClick={() =>
+                                handleViewOrder(item)
+                              }
+                            >
+                              <FaEye />
+                            </Button>
+
+                            {/* DELETE */}
+                            <Button
+                              color="danger"
+                              size="sm"
+                              disabled={
+                                updatingId === item._id
+                              }
+                              onClick={() =>
+                                handleDelete(item._id)
+                              }
+                            >
+                              <FaTrash />
+                            </Button>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={9}
+                        className="text-center py-5"
+                      >
+                        No Orders Found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+              <div className="d-flex justify-content-center mt-3">
+                <Button
+                  color="secondary"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() =>
+                    setCurrentPage((prev) => prev - 1)
+                  }
+                >
+                  Previous
+                </Button>
+
+                <span className="mx-3 align-self-center">
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <Button
+                  color="secondary"
+                  size="sm"
+                  disabled={currentPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) => prev + 1)
+                  }
+                >
+                  Next
+                </Button>
+              </div>
+            </>
           )}
         </CardBody>
       </Card>
@@ -565,7 +615,11 @@ const Orders = () => {
 
                         <td width="90">
                           <img
-                            src={product.image}
+                            src={
+                              Array.isArray(product.image)
+                                ? product.image[0]
+                                : product.image
+                            }
                             alt=""
                             style={{
                               width: 60,
@@ -577,7 +631,7 @@ const Orders = () => {
                         </td>
 
                         <td>
-                          {product.name}
+                          {product.productId}
                         </td>
 
                         <td>
