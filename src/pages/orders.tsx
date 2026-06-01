@@ -631,7 +631,7 @@ const Orders = () => {
                         </td>
 
                         <td>
-                          {product.productId}
+                          {product?.name}
                         </td>
 
                         <td>
